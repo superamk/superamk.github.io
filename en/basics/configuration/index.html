@@ -1097,10 +1097,18 @@
 
 	
 
-<h2 id="global-site-parameters"> GPIO 핀 이용하기</h2>
-<p><img src="/en/basics/configuration/images/gpio1.png?width=50pc" alt="amk gpio audio board" /></p>
-<p><img src="/en/basics/configuration/images/gpio2.png?width=50pc" alt="amk gpio audio board2" /></p>
-<p><img src="/en/basics/configuration/images/gpio3.png?width=50pc" alt="raspberry pi gpio" /></p>
+<h2 id="gpio-pin-usage"> GPIO 핀 이용하기</h2>
+<h3 id="gpio-pin-pic"> AMK GPIO PIN 구성도</h3>
+<p>AMK 단말의 GPIO PIN의 경우 Voice Interface Board에 위치하고 있습니다. KAON이라는 글자가 적힌 부분이 끝부분입니다.(39, 40번이 위치함)</br>
+AMK 단말의 GPIO의 경우 3, 5, 19, 21, 23, 24, 26, 36번이 사용되고 있습니다. 따라서 해당 PIN 번호는 사용하실 때 피해 주셔야 됩니다.
+</p>
+<p><img src="/en/basics/configuration/images/gpio1.png?width=50pc" alt="amk gpio audio board" />
+<center> AMK 단말의 GPIO PIN 위치 </center>
+</p>
+<p><img src="/en/basics/configuration/images/gpio3.png?width=50pc" alt="raspberry pi gpio" />
+<center> AMK 단말 예약된 GPIO PIN 번호</center>
+</p>
+
 <p>On top of <a href="https://gohugo.io/overview/configuration/">Hugo global configuration</a>, <strong>Hugo-theme-learn</strong> lets you define the following parameters in your <code>config.toml</code> (here, values are default).</p>
 
 <p>Note that some of these parameters are explained in details in other sections of this documentation.</p>
