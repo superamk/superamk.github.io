@@ -1076,60 +1076,345 @@
         </div>
         
         <div id="body-inner">
-          
             <h1>
               
-              Button
+              2-2. ?? ????
             </h1>
           
 
-        
+        <!-- ?? -->
+
+<p><strong>?? ????? <a href="https://github.com/gigagenie/ai-makers-kit/">AMK Github ???</a>?? ?? ?? ? ????.</strong></p>
+
+<h3 id="complex-example">?? ???? ?? </h3>
+
+<div class="notices note" >
+<p>
+<a href="https://superamk.github.io/en/cont/archetypes/#cex-1"><strong>1. ??? ??? ? ?? </strong></a></br>
+<a href="https://superamk.github.io/en/cont/archetypes/#cex-2"><strong>2. ??? ?? ???? ?? </strong></a>
+</p>
+</div>
+<h3 id="cex-1"> 1. ??? ???? ?? </h3>
+<strong>Smart Trash Can ??? ????</strong></br>
+AI MAKERS KIT? ???? ??? ????? ???? ???????.</br>
+<p><img src="/en/cont/pages/images/smart_trash_can.png" alt="smart trash can" /></p>
+<strong>1. ??? ??</strong>
+<blockquote>
+* ?? ??? 1? </br>
+* ???? ???? SG90 1?</br>
+* PCA9685 ???? ???? 1?</br>
+* Step-down DC-DC ??? ?? 1?</br>
+* 18650 ?? ??? ?? (18650 * 2) 1?</br>
+* 18650 ?? ??? 1?</br>
+</blockquote>
+
+<strong>2. ??? </strong>
+<p><img src="/en/cont/pages/images/circuit_line2.png" alt="smart trash can circuit_line" /></p>
+<blockquote>
+* Smart Trash Can? 18650 ???? ?? ????, DC ???? ?? ???? ??? ???? ????? ?? SG90 ????? ????.</br>
+* PCA9685 ?????? ?? ?? <strong>SDA, SCL, VCC, GND? ???? ? 2?(VCC), 3?(SDA), 5?(SCL), 6?(GND)</strong>? ????.</br>
+* ???? ? ???? SG90? <strong>PCA9685 ???? 0?</strong>? ???? ??.</br>
+</blockquote>
+
+<strong>3. ?? ?? </strong>
+<blockquote>
+* <code><a href = "https://github.com/gigagenie/ai-makers-kit/tree/master/python/example_apps/proj1_stc">PCA9685.py</a></code>: SG90 ???? ?? ???? </br>
+* <code><a href = "https://github.com/gigagenie/ai-makers-kit/tree/master/python/example_apps/proj1_stc">smart_trash_can.py</a></code>: Smart Trash Can ?? ?? ??</br>
+</blockquote>
+
+<pre><code class="language-python">
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 
+""" This application is Copyright ? KT Corp. All rights reserved. """
 
-<p>A button is a just a clickable button with optional icon.</p>
+"""The Python implementation of GiGA Genie gRPC client"""
 
-<pre><code>{{% button href=&quot;https://getgrav.org/&quot; %}}Get Grav{{% /button %}}
-{{% button href=&quot;https://getgrav.org/&quot; icon=&quot;fas fa-download&quot; %}}Get Grav with icon{{% /button %}}
-{{% button href=&quot;https://getgrav.org/&quot; icon=&quot;fas fa-download&quot; icon-position=&quot;right&quot; %}}Get Grav with icon right{{% /button %}}
+from __future__ import print_function
+import grpc
+import PCA9685 as servo		# Import Servo Motor Driver
+import time                # Import necessary modules
+
+import gigagenieRPC_pb2
+import gigagenieRPC_pb2_grpc
+
+import os
+import datetime
+import hmac
+import hashlib
+from threading import Timer
+
+############
+import RPi.GPIO as GPIO
+GPIO.VERSION
+GPIO.setmode(GPIO.BOARD)
+#GPIO.setup(29, GPIO.IN)
+GPIO.setup(29, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31, GPIO.OUT)
+button = False
+
+'''
+Smart Trash Can Functions
+(??? ??? ?? ?? ??? ??)
+setup: ?? ???? ?? ??
+open_tc: ???? ?? ??
+close_tc: ???? ?? ??
+'''
+###############################################
+def setup(busnum=None):
+	global openPWM, homePWM, pwm
+	openPWM = 420
+	homePWM = 700
+	offset =0
+	try:
+		for line in open('config'):
+			if line[0:8] == 'offset =':
+				offset = int(line[9:-1])
+	except:
+		print("config error")
+	openPWM += offset
+	homePWM += offset
+	if busnum == None:
+		pwm = servo.PWM()                  # Initialize the servo controller.
+	else:
+		pwm = servo.PWM(bus_number=busnum) # Initialize the servo controller.
+	pwm.frequency = 60
+
+def open_tc():
+	global openPWM
+	pwm.write(0, 0, openPWM)  # CH0
+
+def close_tc():
+	global homePWM
+	pwm.write(0, 0, homePWM)
+################################################
+
+
+def callback(channel):
+	print("falling edge detected from pin {}".format(channel))
+	global button
+	button = True
+
+GPIO.add_event_detect(29, GPIO.FALLING, callback=callback, bouncetime=10)
+
+############
+import numpy as np
+import ex2_getVoice2Text as gv2t
+import ex4_getText2VoiceStream as gt2vt
+
+# Config for GiGA Genie gRPC
+CLIENT_ID = ''
+CLIENT_KEY = ''
+CLIENT_SECRET = ''
+HOST = 'gate.gigagenie.ai' 
+PORT = 4080 
+
+### COMMON : Client Credentials ###
+def getMetadata():
+	timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
+	message = CLIENT_ID + ':' + timestamp
+
+	signature = hmac.new(CLIENT_SECRET, message, hashlib.sha256).hexdigest()
+
+	metadata = [('x-auth-clientkey', CLIENT_KEY),
+				('x-auth-timestamp', timestamp),
+				('x-auth-signature', signature)]
+
+	return metadata
+
+def credentials(context, callback):
+	callback(getMetadata(), None)
+
+def getCredentials():
+	with open('../data/ca-bundle.pem', 'rb') as f:
+		trusted_certs = f.read()
+	sslCred = grpc.ssl_channel_credentials(root_certificates=trusted_certs)
+
+	authCred = grpc.metadata_call_credentials(credentials)
+
+	return grpc.composite_channel_credentials(sslCred, authCred)
+
+### KWS
+import pyaudio
+import audioop
+from six.moves import queue
+
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 16000
+CHUNK = 512
+
+# MicrophoneStream - original code in https://goo.gl/7Xy3TT
+class MicrophoneStream(object):
+	"""Opens a recording stream as a generator yielding the audio chunks."""
+	def __init__(self, rate, chunk):
+		self._rate = rate
+		self._chunk = chunk
+
+		# Create a thread-safe buffer of audio data
+		self._buff = queue.Queue()
+		self.closed = True
+
+	def __enter__(self):
+		self._audio_interface = pyaudio.PyAudio()
+		self._audio_stream = self._audio_interface.open(
+			format=pyaudio.paInt16,
+			channels=1, rate=self._rate,
+			input=True, frames_per_buffer=self._chunk,
+			# Run the audio stream asynchronously to fill the buffer object.
+			# This is necessary so that the input device's buffer doesn't
+			# overflow while the calling thread makes network requests, etc.
+			stream_callback=self._fill_buffer,
+		)
+
+		self.closed = False
+
+		return self
+
+	#def __exit__(self, type, value, traceback):
+	def __exit__(self, type, value, traceback):		
+		self._audio_stream.stop_stream()
+		self._audio_stream.close()
+		self.closed = True
+		# Signal the generator to terminate so that the client's
+		# streaming_recognize method will not block the process termination.
+		self._buff.put(None)
+		self._audio_interface.terminate()
+	
+	def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
+		"""Continuously collect data from the audio stream, into the buffer."""
+		self._buff.put(in_data)
+		return None, pyaudio.paContinue
+
+	def generator(self):
+		while not self.closed:
+			# Use a blocking get() to ensure there's at least one chunk of
+			# data, and stop iteration if the chunk is None, indicating the
+			# end of the audio stream.
+			chunk = self._buff.get()
+			if chunk is None:
+				return
+			data = [chunk]
+
+			# Now consume whatever other data's still buffered.
+			while True:
+				try:
+					chunk = self._buff.get(block=False)
+					if chunk is None:
+						return
+					data.append(chunk)
+				except queue.Empty:
+					break
+
+			yield b''.join(data)
+# [END audio_stream]
+
+def print_rms(rms):
+	out = ''
+	for _ in xrange(int(round(rms/30))):
+		out = out + '*'
+	
+	print (out)
+
+# KWS
+
+import ktkws
+KWSID = ['????', '???', '???', '???']
+
+def detect():
+	global button
+	with MicrophoneStream(RATE, CHUNK) as stream:
+		audio_generator = stream.generator()
+
+		for content in audio_generator:
+			#import binascii
+			#print ("INBYTE: %s" % (binascii.hexlify(bytearray(content))))
+			GPIO.output(31, GPIO.HIGH)
+			rc = ktkws.detect(content)
+			rms = audioop.rms(content,2)
+			#print('audio rms = %d' % (rms))
+			GPIO.output(31, GPIO.LOW)
+			if (button == True):
+				rc = 1
+				button = False
+			
+			if (rc == 1):
+				GPIO.output(31, GPIO.HIGH)
+				gt2vt.play_file("../data/sample_sound.wav")
+				return 200
+
+def kws_test():
+	rc = ktkws.init("../data/kwsmodel.pack")
+	print ('init rc = %d' % (rc))
+	rc = ktkws.start()
+	#print ('start rc = %d' % (rc))
+	ktkws.set_keyword(KWSID.index('????'))
+	rc = detect()
+	print ('detect rc = %d' % (rc))
+	ktkws.stop()
+	ktkws.reset()
+	return rc
+
+def control_action(text):
+	open_can = '??'.decode('utf-8')
+	open_can2 = '???'.decode('utf-8')
+	open_can3 = '??'.decode('utf-8')
+	close_can = '??'.decode('utf-8')
+	close_can2 = '???'.decode('utf-8')
+	#cmd_init()
+	
+	if (open_can in text or open_can2 in text):
+		print('open the trash can')
+		gt2vt.getText2VoiceStream("??","./stc_yes.wav")
+		gt2vt.play_file("./stc_yes.wav")
+		time.sleep(1)
+		open_tc()
+		time.sleep(3)
+	elif (close_can in text or close_can2 in text):
+		print('close the trash can')
+		gt2vt.getText2VoiceStream("??","./stc_yes.wav")
+		gt2vt.play_file("./stc_yes.wav")
+		close_tc()
+	else:
+		print('action nothing')
+
+def main():
+	setup()
+	while 1:
+		retry_game = True
+		button = False
+		recog=kws_test()
+		say_exit = '??'.decode('utf-8')
+		if recog == 200:
+			gt2vt.getText2VoiceStream("????? ??? ??????","./stc_opening.wav")
+			gt2vt.play_file("./stc_opening.wav")
+			time.sleep(0.8)
+			while 1:
+				if retry_game:
+					text = gv2t.getVoice2Text()
+					control_action(text)
+					if(say_exit in text):
+						gt2vt.getText2VoiceStream("?????","./stc_thanku.wav")
+						gt2vt.play_file("./stc_opening.wav")
+						break
+		else:
+			print('Not play now ...')
+
+if __name__ == '__main__':
+	main()
+
+</code></pre>
+<strong>4. ?? ?? </strong>
+??? ??? ?? ???? ?????.
+<pre><code class="language-markdown">
+pi@raspberrypi:~/ai-makers-kit/ex_app/proj1_stc $ python smart_trash_can.py
 </code></pre>
 
-<p>
-<a  href="https://getgrav.org/" target="_blank"  class="btn btn-default">
-  
-  
-  
-  Get Grav
-  
-</a>
-
-
-<a  href="https://getgrav.org/" target="_blank"  class="btn btn-default">
-  
-  
-  
-    
-  <i class="fas fa-download"></i>
-    
-  
-  Get Grav with icon
-  
-</a>
-
-
-<a  href="https://getgrav.org/" target="_blank"  class="btn btn-default">
-  
-  
-  
-    
-  
-  Get Grav with icon right
-  
-  <i class="fas fa-download"></i>
-  
-</a>
-</p>
-
+<strong>5. ?? ??? </strong>
+<blockquote>
+<a href="http://www.youtube.com/watch?v=LSxxszpk2NE"><img src="/en/cont/pages/images/smart_trash_can2.jpg" alt="smart trash can movie" /></a>
+</blockquote>
 
 <footer class=" footline" >
 	
