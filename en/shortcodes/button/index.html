@@ -1121,26 +1121,26 @@ WantedBy=multi-user.target
 
 <strong>2. 작성한 서비스 파일을 시스템에 등록 </strong>
 <blockquote>
-아래 순서로 작성한 서비스 스크립트를 라즈비안 시스템에 등록합니다.
+<strong>아래 순서로 작성한 서비스 스크립트를 라즈비안 시스템에 등록합니다.</strong>
 <blockquote>
-서비스 파일 권한 설정을 644로 변경
+1) 서비스 파일 권한 설정을 644로 변경
 아래 명령어를 통해 수행합니다.
 <pre> sudo chmod 644 /lib/systemd/system/myscript.service </pre>
 </br>
-해당 서비스 파일이 시스템 상에 데몬으로 올라가도록 설정
+2) 해당 서비스 파일이 시스템 상에 데몬으로 올라가도록 설정
 <pre>
 sudo systemctl daemon-reload
 sudo systemctl enable myscript.service
 </pre>
-재부팅
+3) 재부팅
 <pre> sudo reboot </pre>
 
-상주 중인 서비스 상태 확인 (필요시)
+4) 상주 중인 서비스 상태 확인 (필요시)
 <pre>
 $ sudo systemctl status myscript.service
 </pre>
 </blockquote>
-4번 과정을 통해 작성한 파이썬 프로그램이 OS에 자동으로 실행된 것을 확인할 수 있습니다.
+<strong>4번 과정을 통해 작성한 파이썬 프로그램이 OS에 자동으로 실행된 것을 확인할 수 있습니다.</strong>
 </blockquote>
 
 <footer class=" footline" >
