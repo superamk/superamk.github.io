@@ -1089,8 +1089,8 @@
         <div id="body-inner">
           
             <h1>
+              2-1. 응용 프로젝트
               
-              Pages organization
             </h1>
           
 
@@ -1101,41 +1101,68 @@
 
 	
 
-<p>In <strong>Hugo</strong>, pages are the core of your site. Once it is configured, pages are definitely the added value to your documentation site.</p>
+<p>모든 소스코드는 <a href="https://gohugo.io/content/organization/">AMK Github 사이트</a>에서 다운 받을 수 있습니다.</p>
 
-<h2 id="folders">Folders</h2>
+<h2 id="simple-example"> 예제 목록 </h2>
 
-<p>Organize your site like <a href="https://gohugo.io/content/organization/">any other Hugo project</a>. Typically, you will have a <em>content</em> folder with all your pages.</p>
-
-<pre><code>content
-├── level-one
-│   ├── level-two
-│   │   ├── level-three
-│   │   │   ├── level-four
-│   │   │   │   ├── _index.md       &lt;-- /level-one/level-two/level-three/level-four
-│   │   │   │   ├── page-4-a.md     &lt;-- /level-one/level-two/level-three/level-four/page-4-a
-│   │   │   │   ├── page-4-b.md     &lt;-- /level-one/level-two/level-three/level-four/page-4-b
-│   │   │   │   └── page-4-c.md     &lt;-- /level-one/level-two/level-three/level-four/page-4-c
-│   │   │   ├── _index.md           &lt;-- /level-one/level-two/level-three
-│   │   │   ├── page-3-a.md         &lt;-- /level-one/level-two/level-three/page-3-a
-│   │   │   ├── page-3-b.md         &lt;-- /level-one/level-two/level-three/page-3-b
-│   │   │   └── page-3-c.md         &lt;-- /level-one/level-two/level-three/page-3-c
-│   │   ├── _index.md               &lt;-- /level-one/level-two
-│   │   ├── page-2-a.md             &lt;-- /level-one/level-two/page-2-a
-│   │   ├── page-2-b.md             &lt;-- /level-one/level-two/page-2-b
-│   │   └── page-2-c.md             &lt;-- /level-one/level-two/page-2-c
-│   ├── _index.md                   &lt;-- /level-one
-│   ├── page-1-a.md                 &lt;-- /level-one/page-1-a
-│   ├── page-1-b.md                 &lt;-- /level-one/page-1-b
-│   └── page-1-c.md                 &lt;-- /level-one/page-1-c
-├── _index.md                       &lt;-- /
-└── page-top.md                     &lt;-- /page-top
-</code></pre>
-
-
-<div class="notices note" ><p><code>_index.md</code> is required in each folder, it’s your “folder home page”</p>
+<div class="notices note" >
+<p><strong>1. GPIO 버튼 LED 제어하기</strong></p>
 </div>
+<h3 id="ex-1"> 1. GPIO 버튼 LED 제어하기 </h2>
+<pre><code class="language-python">
+#!/usr/bin/env python
+from __future__ import print_function
 
+
+
+import time
+import ex1_kwstest as kws
+import ex2_getVoice2Text as gv2t
+import ex4_getText2VoiceStream as tts
+import RPi.GPIO as GPIO
+import MicrophoneStream as MS
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(31, GPIO.OUT)
+
+def ledControl(result):
+    text = result
+    if text.find("불 켜") >= 0:
+        print("불이 켜집니다.")
+        GPIO.output(31, GPIO.HIGH)
+        return("불을 킵니다.")
+
+    elif text.find("불 꺼") >= 0:
+        print("불이 꺼집니다.")
+        GPIO.output(31, GPIO.LOW)
+        return("불을 끕니다.")
+
+    else :
+        return("정확한 명령을 말해주세요")
+
+def main():
+	#Example7 KWS+STT
+    KWSID = ['기가지니', '지니야', '친구야', '자기야']
+    while 1:
+        recog=kws.test(KWSID[0])
+        if recog == 200:
+            print('KWS Dectected ...\n Start STT...')
+            text = gv2t.getVoice2Text()
+            print('Recognized Text: '+ text)
+            tts.getText2VoiceStream(ledControl(text), "result_TTS.wav")
+            MS.play_file("result_TTS.wav")
+            time.sleep(2)
+
+        else:
+            print('KWS Not Dectected ...')
+
+if __name__ == '__main__':
+    try:
+        main()
+
+    finally:
+        GPIO.cleanup()
+</code></pre>
 
 <h2 id="types">Types</h2>
 
