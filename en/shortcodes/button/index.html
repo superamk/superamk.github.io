@@ -1122,19 +1122,19 @@ WantedBy=multi-user.target
 <blockquote>
 <strong>아래 순서로 작성한 서비스 스크립트를 라즈비안 시스템에 등록합니다.</strong></br>
 <blockquote>
-1) 서비스 파일 권한 설정을 644로 변경
+<strong>1) 서비스 파일 권한 설정을 644로 변경</strong>
 아래 명령어를 통해 수행합니다.
 <pre> sudo chmod 644 /lib/systemd/system/myscript.service </pre>
 </br>
-2) 해당 서비스 파일이 시스템 상에 데몬으로 올라가도록 설정
+<strong>2) 해당 서비스 파일이 시스템 상에 데몬으로 올라가도록 설정</strong>
 <pre>
 sudo systemctl daemon-reload
 sudo systemctl enable myscript.service
 </pre>
-3) 재부팅
+<strong>3) 재부팅</strong>
 <pre> sudo reboot </pre>
 
-4) 상주 중인 서비스 상태 확인 (필요시)
+<strong>4) 상주 중인 서비스 상태 확인 (필요시)</strong>
 <pre>
 $ sudo systemctl status myscript.service
 </pre>
