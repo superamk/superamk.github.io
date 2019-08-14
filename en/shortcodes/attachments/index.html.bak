@@ -146,7 +146,7 @@
         
         ">
       <a href="/en/basics/requirements/">
-          1-1. 사전준비 <!-- Requirements -->
+          1-1. ???? <!-- Requirements -->
           
             <i class="fas fa-check read-icon"></i>
           
@@ -172,7 +172,7 @@
         
         ">
       <a href="/en/basics/installation/">
-          1-2. 예제코드 설명 <!-- Installation -->
+          1-2. ???? ?? <!-- Installation -->
           
             <i class="fas fa-check read-icon"></i>
           
@@ -198,7 +198,7 @@
         
         ">
       <a href="/en/basics/configuration/">
-          1-3. GPIO PIN 설정 <!-- Configuration -->
+          1-3. GIPO PIN ?? <!-- Configuration -->
           
             <i class="fas fa-check read-icon"></i>
           
@@ -257,7 +257,7 @@
         
         ">
       <a href="/en/cont/">
-          <b>2. </b> 응용 / 심화 예제
+          <b>2. </b> ?? / ?? ??
           
             <i class="fas fa-check read-icon"></i>
           
@@ -286,7 +286,7 @@
         
         ">
       <a href="/en/cont/pages/">
-          2-1. 응용 프로젝트 <!-- Pages organization-->
+          2-1. ?? ???? <!-- Pages organization-->
           
             <i class="fas fa-check read-icon"></i>
           
@@ -308,7 +308,7 @@
     
       <li data-nav-id="/en/cont/archetypes/" title="Archetypes" class="dd-item ">
         <a href="/en/cont/archetypes/">
-        2-2. 심화 프로젝트 <!-- Archetypes -->
+        2-2. ?? ???? <!-- Archetypes -->
         <i class="fas fa-check read-icon"></i>
         </a>
     </li>
@@ -441,7 +441,7 @@
         
         ">
       <a href="/en/shortcodes/">
-          <b>3. </b> 개발 팁
+          <b>3. </b> ?? ?
           
             <i class="fas fa-check read-icon"></i>
           
@@ -485,7 +485,7 @@
     
       <li data-nav-id="/en/shortcodes/button/" title="Button" class="dd-item ">
         <a href="/en/shortcodes/button/">
-        3-2. 개발 노하우 <!-- Button -->
+        3-2. ?? ??? <!-- Button -->
         <i class="fas fa-check read-icon"></i>
         </a>
     </li>
